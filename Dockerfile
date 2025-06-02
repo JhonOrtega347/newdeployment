@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk
+FROM amazoncorretto:11
 WORKDIR /app
 COPY target/*.jar app.jar
 EXPOSE 8080
