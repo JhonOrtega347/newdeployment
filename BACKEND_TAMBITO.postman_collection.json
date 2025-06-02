@@ -1,0 +1,1235 @@
+{
+	"info": {
+		"_postman_id": "3cf1dc25-a1ba-4320-9ee7-6e02ee95285e",
+		"name": "BACKEND_TAMBITO",
+		"description": "Hola a todos,\n\nPara que puedan usar y probar el backend correctamente, les dejo una guía con los pasos principales y detalles importantes:\n\n**Información inicial:**\n\nEl sistema crea automáticamente dos usuarios por defecto:\n\n- **Administrador** (id: 1)\n    \n- **Encargado** (id: 2)\n    \n\nPueden verificar sus correos y contraseñas en el archivo _DataSeeder_.\n\n---\n\n### 1\\. Crear un usuario\n\n- Al crear un nuevo usuario, **automáticamente tendrá el rol \"Cliente\"**, sin necesidad de incluirlo en el body de la petición.\n    \n- Al registrarlo, recibirás un token JWT que deberás usar para acceder a los endpoints autorizados para ese usuario.\n    \n\n---\n\n### 2\\. Crear un local\n\n- **Solo el usuario con rol ADMIN** puede crear un local.\n    \n- El local tendrá un encargado asignado, y esta información debe ir incluida en el body al momento de crearlo (esto ya está contemplado en el body).\n    \n\n---\n\n### 3\\. Crear productos\n\n- **Solo ADMIN** puede crear productos asociados a un local.\n    \n- En la sección Producto -> Crear Producto, solo envía el body con los datos solicitados y haz clic en \"SEND\".\n    \n- Se recomienda crear entre 2 y 3 productos distintos para probar correctamente.\n    \n\n---\n\n### 4\\. Crear promociones\n\n- **Solo ADMIN** puede crear promociones.\n    \n- En el body de la petición debes indicar:\n    \n    - Los IDs de los productos que formarán parte de la promoción\n        \n    - El porcentaje de descuento que deseas aplicar\n        \n\n---\n\n### 5\\. Agregar productos al carrito\n\n- **Solo usuarios con rol CLIENTE** pueden agregar productos a su carrito.\n    \n- Usando el token JWT del usuario registrado, en la sección Carrito podrás usar el endpoint para agregar productos al carrito.\n    \n\n---\n\n### 6\\. Agregar promociones al carrito\n\n- Igual que con los productos, los usuarios CLIENTE pueden agregar promociones a su carrito usando su token.\n    \n\n---\n\n### 7\\. Llamar a carrito\n\n- aca veras los productos y promociones que hayas agregado\n    \n\n---\n\n**Nota importante:**\n\nEl usuario ADMIN tiene acceso a casi todos los endpoints excepto aquellos relacionados con el carrito, ya que el carrito es exclusivo para cada usuario cliente.\n\n---\n\nSi necesitan ayuda con algún paso o con los demás endpoints, estoy aquí para apoyarles.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43499852"
+	},
+	"item": [
+		{
+			"name": "LOCALES",
+			"item": [
+				{
+					"name": "CREAR LOCALES",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJpYXQiOjE3NDgyMTYwMzUsImV4cCI6MTc0ODMwMjQzNX0.foaWVpauvE1UV2xs7ju1PQyJLRq_0a5o8VndUKY7GfJsVcm6SlXRZiK8Glro84cNcP7y2SA3sFrR9KIoCsBBaA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sede\": \"TAMBOTEC\",\r\n  \"direccion\": \"Av. Principal 123\",\r\n  \"telefono\": \"+51987654321\",\r\n  \"horario\": \"9am - 6pm\",\r\n  \"encargadoId\": 2\r\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/locales",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"locales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BUSCARLOCAL POR ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMIN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sede\": \"Sede Lima\",\r\n  \"direccion\": \"Av. Principal 123\",\r\n  \"telefono\": \"+51987654321\",\r\n  \"horario\": \"9am - 6pm\",\r\n  \"encargadoId\": 18\r\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/locales/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"locales",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SECURITY",
+			"item": [
+				{
+					"name": "Obtener perfil de usuario",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/usuarios/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"me"
+							]
+						},
+						"description": "Obtener la información del usuario autenticado actual. Roles permitidos: ADMIN, REGISTRADOR, CONSULTOR."
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar contraseña",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKb2VsLnNhZHNhZGFzZGFzQEFETUlOSVNUUkFET1IuY29tIiwiaWF0IjoxNzQ4MTIzNDE5LCJleHAiOjE3NDgyMDk4MTl9.R_nFH_bhbJ97ooPGDJ49RsLA1An3zRipFiKPKdUZJ4FltEVFoMiiR421bH0KYJLmkM-2E0n5y1s4QjUtp_hFYA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"currentPassword\": \"contraseña123\",\r\n  \"newPassword\": \"pasword1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/usuarios/change-password",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"change-password"
+							]
+						},
+						"description": "Cambiar la contraseña del usuario actual. Roles permitidos: ADMIN, REGISTRADOR, CONSULTOR."
+					},
+					"response": []
+				},
+				{
+					"name": "REGISTER",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Joel equidee\",\r\n  \"correo\": \"Joel.sadsadasdas@ADMINISTRADOR.com\",\r\n  \"contrasena\": \"contraseña123\",\r\n  \"direccion\": \"Jr. Los ñeeñofiee 456, Cusco\",\r\n  \"telefono\": \"+51911245626\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar sesión admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@admin.com\",\r\n  \"password\": \"admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Iniciar sesión y obtener un token JWT. Roles permitidos: PUBLIC."
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar sesión cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"Joel.sadsadasdas@ADMINISTRADOR.com\",\r\n  \"password\": \"contraseña123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Iniciar sesión y obtener un token JWT. Roles permitidos: PUBLIC."
+					},
+					"response": []
+				},
+				{
+					"name": "BUSCAR USUARIO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJpYXQiOjE3NDgxMjMyMTksImV4cCI6MTc0ODIwOTYxOX0.nCnSkya1YmIeQ3_XmXaeaBMWQARcUiBxuumRsekaMMaBtz5F2C1IqKMSGal7aPgxmFtVieUp5liZk1708H0GeQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/usuarios/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PRODUCTOS",
+			"item": [
+				{
+					"name": "CREAR PRODUCTO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMINISTRADOR\n}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "     {\r\n        \"nombre\": \"Jugo De naranja\",\r\n        \"fechaVencimiento\": \"2025-08-30\",\r\n        \"descripcion\": \"Botella de jugo natural de naranja 1 litro\",\r\n        \"precio\": 5.75,\r\n        \"stock\": 80,\r\n        \"categoria\": \"Bebidas\",\r\n        \"pedidoId\": 8,\r\n        \"peso\": 1.8,\r\n        \"localId\": 1\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT PRODUCTO",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"PRODUCTOONE\",\r\n  \"fechaVencimiento\": \"2025-12-31\",\r\n  \"descripcion\": \"Descripción del producto de prueba\",\r\n  \"precio\": 25.99,\r\n  \"stock\": 100,\r\n  \"categoria\": \"Abarrotes\",\r\n  \"pedidoId\": 5,\r\n  \"peso\": 1.5,\r\n  \"localId\": 6\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/productos/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE PRODUCTO",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"PRODUCTOONE\",\r\n  \"fechaVencimiento\": \"2025-12-31\",\r\n  \"descripcion\": \"Descripción del producto de prueba\",\r\n  \"precio\": 25.99,\r\n  \"stock\": 100,\r\n  \"categoria\": \"Abarrotes\",\r\n  \"pedidoId\": 5,\r\n  \"peso\": 1.5,\r\n  \"localId\": 6\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/productos/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/productos/local/6",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"local",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/productos/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO nombre",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "   {\r\n    \r\n        \"nombre\": \"Jugo De papaya\",\r\n        \"fechaVencimiento\": \"2025-08-30\",\r\n        \"descripcion\": \"Botella de jugo natural de papaya 1 litro\",\r\n        \"precio\": 5.75,\r\n        \"stock\": 80,\r\n        \"categoria\": \"Bebidas\",\r\n        \"pedidoId\": 8,\r\n        \"peso\": 1.2,\r\n        \"localId\": 6\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/productos/buscar/nombre/jugo",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"buscar",
+								"nombre",
+								"jugo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO categoria",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"nombre\": \"Producto Ejemplo\",\r\n  \"fechaVencimiento\": \"2025-12-31\",\r\n  \"descripcion\": \"Descripción del producto de prueba\",\r\n  \"precio\": 25.99,\r\n  \"stock\": 100,\r\n  \"categoria\": \"Abarrotes\",\r\n  \"pedidoId\": 5,\r\n  \"peso\": 1.5,\r\n  \"localId\": 3\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{host}}/api/productos/buscar/categoria/Bebidas",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"buscar",
+								"categoria",
+								"Bebidas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO buscar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/productos/buscar",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"buscar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTO buscar LOCAL ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/productos/local/6",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"productos",
+								"local",
+								"6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PROMOCIONES",
+			"item": [
+				{
+					"name": "crear promocion",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ADMINISTRADOR\n}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codigoPromocion\": \"promaso 2x1\",\r\n  \"nombre\": \"Descuento inviernooo 2025\",\r\n  \"descripcion\": \"Promoción especial por aaaabbbbbbbbba con 20% de descuento\",\r\n  \"fechaInicio\": \"2025-06-01\",\r\n  \"fechaFin\": \"2025-06-30\",\r\n  \"porcentajeDescuento\": 20.0,\r\n  \"productosIds\": [1, 2]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/promociones",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"promociones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get promocion",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{host}}/api/promociones",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"promociones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get promocion id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJpYXQiOjE3NDgyMjUwNDcsImV4cCI6MTc0ODMxMTQ0N30.cpZ7ynNt0wYtDOGHlD3pqqeDelohuMzvTTgXu41jfTxQAXZgYtt4sIXqzpr1IASSNSnjc0p8tl53cl2hlqzv_A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codigoPromocion\": \"PROMO2025\",\r\n  \"nombre\": \"Descuento Verano 2025\",\r\n  \"descripcion\": \"Promoción especial por verano con 20% de descuento\",\r\n  \"fechaInicio\": \"2025-06-01\",\r\n  \"fechaFin\": \"2025-06-30\",\r\n  \"productosIds\": [5,6]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/promociones/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"promociones",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete promocion id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"codigoPromocion\": \"PROMO2025\",\r\n  \"nombre\": \"Descuento Verano 2025\",\r\n  \"descripcion\": \"Promoción especial por verano con 20% de descuento\",\r\n  \"fechaInicio\": \"2025-06-01\",\r\n  \"fechaFin\": \"2025-06-30\",\r\n  \"productosIds\": [5,6]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/promociones/7",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"promociones",
+								"7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RESEÑAS",
+			"item": [
+				{
+					"name": "CLIENTE",
+					"item": [
+						{
+							"name": "AGREGAR RESENA",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{CLIENTE}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productoId\": 3,\r\n  \"calificacion\": 5,\r\n  \"comentario\": \"Muy bueno el producto\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/resenas",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar resena",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{CLIENTE}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productoId\": 1,\r\n  \"calificacion\": 3,\r\n  \"comentario\": \"Actualizado por cliente\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/resenas/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar reseñas por producto",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{CLIENTE}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/resenas/producto/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"producto",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar mis reseñas (del usuario autenticado)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{CLIENTE}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/resenas/mis-resenas",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"mis-resenas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar reseña propia",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{CLIENTE}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/resenas/{id_resena}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"{id_resena}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "deberas agregar el token de cliente para que funcione"
+				},
+				{
+					"name": "ADMIN",
+					"item": [
+						{
+							"name": "RESENAS DE USUARIO ID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ADMIN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productoId\": 1,\r\n  \"usuarioId\": 3,\r\n  \"calificacion\": 5,\r\n  \"comentario\": \"Reseña creada por admin\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/resenas/usuario/3",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"usuario",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RESENAS DE PRODUCTO ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ADMIN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/resenas/producto/{idProducto}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"producto",
+										"{idProducto}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ELIMINAR cualquier reseña",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ADMIN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/resenas/admin/{id_resena}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"admin",
+										"{id_resena}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar cualquier reseña Copy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ADMIN}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"productoId\": 1,\r\n  \"usuarioId\": 3,\r\n  \"calificacion\": 4,\r\n  \"comentario\": \"Reseña actualizada por administrador\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/resenas/admin/{id_resena}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"resenas",
+										"admin",
+										"{id_resena}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Deberas crear el token de el admin para usar sus endpoints"
+				}
+			]
+		},
+		{
+			"name": "CARRITO",
+			"item": [
+				{
+					"name": "AGREGAR PRODUCTO A CARRITO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKb2VsLnNhZHNhZGFzZGFzQEFETUlOSVNUUkFET1IuY29tIiwiaWF0IjoxNzQ4MjI4NzM3LCJleHAiOjE3NDgzMTUxMzd9.Vi2lM_yFKU8_7y82yz5LohgpPOEjjcfpN-abqaXe0AWl0W1M-Hd4a9noQXhqrpWk5QpIUrodb35QeJ6xwVc90g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/carrito/producto/2?cantidad=2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrito",
+								"producto",
+								"2"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ELIMINAR PRODUCTO DE CARRITO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/carrito/producto/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"carrito",
+								"producto",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AGREGAR PROMOCION A CARRITO",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/carrito/promocion/1?cantidad=2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"carrito",
+								"promocion",
+								"1"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ELIMINAR PROMOCION DE CARRITO POR ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/carrito/promocion/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"carrito",
+								"promocion",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET CARRITO DE USUARIO CON SU TOKEN",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKb2VsLnNhZHNhZGFzZGFzQEFETUlOSVNUUkFET1IuY29tIiwiaWF0IjoxNzQ4MjI4NzM3LCJleHAiOjE3NDgzMTUxMzd9.Vi2lM_yFKU8_7y82yz5LohgpPOEjjcfpN-abqaXe0AWl0W1M-Hd4a9noQXhqrpWk5QpIUrodb35QeJ6xwVc90g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/carrito",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"carrito"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "IA_CHATGPT",
+			"item": [
+				{
+					"name": "CONSULTA CHATBOT",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{CLIENTE}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "tengo hambre quiero un snack que me podrias recomendar quiero algo dulce ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/chat",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
