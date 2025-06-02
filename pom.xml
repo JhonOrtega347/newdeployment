@@ -5,8 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>2.7.15</version> <!-- Use the latest 2.7.x version -->
+        <relativePath/>
     </parent>
     <groupId>com.example</groupId>
     <artifactId>p_backend-sigmaorder</artifactId>
@@ -108,8 +108,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version> <!-- Use the latest version -->
             <optional>true</optional>
         </dependency>
+
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -142,7 +145,9 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
                         </path>
+
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
