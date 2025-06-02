@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @ConditionalOnProperty(name = "app.chat.enabled", havingValue = "true", matchIfMissing = true)
 @Service
 public class ChatService {
@@ -38,9 +39,9 @@ public class ChatService {
 
     public String chat(String userPrompt) {
         List<Producto> productos = productoService.findAll();
-        List<Promocion> promociones = promocionService.findActive(); // tu método
+        List<Promocion> promociones = promocionService.findActive();
 
-        // 2) serializar a texto
+        // Build inventory context
         StringBuilder contexto = new StringBuilder("Inventario TamboTec:\n");
         for (Producto p : productos) {
             contexto.append(String.format(
@@ -60,23 +61,21 @@ public class ChatService {
                             .collect(Collectors.joining(", "))
             ));
         }
+
+        // System message with traditional string concatenation for Java 11
+        String systemMessage = "Eres el asistente virtual de TamboTec, una tienda de abarrotes peruana.\n" +
+                "Tu función es ayudar a los clientes a encontrar productos y promociones disponibles en la tienda según lo que deseen comprar.\n" +
+                "Solo debes sugerir productos que estén en el inventario actual y promociones activas.\n\n" +
+                "**IMPORTANTE:** Cada producto o promoción que menciones debe incluir siempre su ID para que el usuario pueda identificarlo fácilmente.\n" +
+                "Cuando hables de productos, incluye: nombre, ID, precio, categoría y stock.\n" +
+                "Cuando menciones promociones, incluye: código de promoción, porcentaje de descuento, productos incluidos con sus respectivos nombres e IDs.\n\n" +
+                "Si el usuario pregunta por productos relacionados con un plato, revisa las promociones activas y menciona las que incluyan esos productos por nombre, ID y descuento.\n\n" +
+                "Sé muy amable y cordial, como un asistente virtual peruano que dice \"caserito\", \"amigo\", etc.\n\n" +
+                "Si no hay productos o promociones que coincidan, responde amablemente que aún no hay disponibles para eso.";
+
         List<ChatRequestMessage> messages = Arrays.asList(
-                new ChatRequestSystemMessage("""
-Eres el asistente virtual de TamboTec, una tienda de abarrotes peruana.  
-Tu función es ayudar a los clientes a encontrar productos y promociones disponibles en la tienda según lo que deseen comprar.  
-Solo debes sugerir productos que estén en el inventario actual y promociones activas.  
-
-**IMPORTANTE:** Cada producto o promoción que menciones debe incluir siempre su ID para que el usuario pueda identificarlo fácilmente.  
-Cuando hables de productos, incluye: nombre, ID, precio, categoría y stock.  
-Cuando menciones promociones, incluye: código de promoción, porcentaje de descuento, productos incluidos con sus respectivos nombres e IDs.
-
-Si el usuario pregunta por productos relacionados con un plato, revisa las promociones activas y menciona las que incluyan esos productos por nombre, ID y descuento.  
-
-Sé muy amable y cordial, como un asistente virtual peruano que dice “caserito”, “amigo”, etc.  
-
-Si no hay productos o promociones que coincidan, responde amablemente que aún no hay disponibles para eso.  
-"""),
-                new ChatRequestSystemMessage(contexto.toString()),// <--- Aquí envías el inventario y promociones reales
+                new ChatRequestSystemMessage(systemMessage),
+                new ChatRequestSystemMessage(contexto.toString()),
                 new ChatRequestUserMessage(userPrompt)
         );
 
@@ -87,8 +86,7 @@ Si no hay productos o promociones que coincidan, responde amablemente que aún n
         ChatCompletions completions = client.complete(options);
         if (completions.getChoices() != null && !completions.getChoices().isEmpty()) {
             return completions.getChoices().get(0).getMessage().getContent();
-        } else {
-            return "No se recibieron respuestas del modelo.";
         }
+        return "No se recibieron respuestas del modelo.";
     }
 }
